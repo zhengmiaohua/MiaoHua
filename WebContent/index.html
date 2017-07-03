@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+		<script src="js/jquery-1.9.1.js"></script>
+		<script src="js/jquery.mobile-1.4.5.js"></script>
+	</head>
+	<body>
+		<div data-role="page" id="index">
+			<div data-role="header" data-position="fixed">
+				<h1>火车时刻查询</h1>
+			</div>
+
+			<div role="main" class="ui-content">
+				<form>
+					<div class="ui-field-contain">
+						<label for="start">发车站：</label>
+						<input type="text" id="startStation" value="">
+					</div>
+					<div class="ui-field-contain">
+						<label for="end">终点站：</label>
+						<input type="text" id="endStation" value="">
+					</div>
+					<div class="ui-field-contain">
+						<label for="num">车次：</label>
+						<input type="text" id="trainNum" value="">
+					</div>
+				</form>
+
+				<a class="ui-btn ui-btn-b ui-corner-all ui-shadow" data-role="button" id="search-submit">搜索</a>
+
+				<ul data-role="listview" data-inset="true" id="list">
+					<!--<li><a href="#">
+						<h2>G1</h2>
+						<p>北京南→上海虹桥</p>
+						<p>用时：4.48</p>
+						<p class="ui-li-aside">09:00:00 开</p>
+					</a></li>
+					<li><a href="#">项目1</a></li>
+					<li><a href="#">项目1</a></li>-->
+				</ul>
+				<!--<table data-role="table" data-mode="reflow" class="ui-responsive table-stroke">
+					<thead>
+						<tr>
+							<th>1</th>
+							<th>2</th>	
+							<th>3</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>4</td>
+							<td>5</td>
+							<td>6</td>
+						</tr>
+					</tbody>
+				</table>-->
+				<!--<p><a href="#index2" data-transition="slide">index2</a></p>-->
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#" data-icon="grid" class="ui-btn-active"></a></li>
+						<li><a href="#" data-icon="star"></a></li>
+						<li><a href="#" data-icon="user"></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div data-role="page" id="detail">
+
+		    <div data-role="header" data-position="fixed">
+		        <h1>火车时刻表查询</h1>
+		    </div>
+
+		    <div role="main" class="ui-content">
+		        <h2></h2>
+		        <table data-role="table" id="movie-table" data-mode="reflow" class="ui-responsive">
+		            <thead>
+		            <tr>
+		                <th data-priority="1">站名</th>
+		                <th data-priority="persist">到站时间</th>
+		                <th data-priority="persist">出发时间</th>
+		            </tr>
+		            </thead>
+		            <tbody>
+		            </tbody>
+		        </table>
+		        <a href="#" class="ui-btn ui-corner-all" data-rel="back">返回</a>
+		    </div>
+
+		    <div data-role="footer">
+		        <div data-role="navbar">
+		            <ul>
+		                <li><a href="#" data-icon="grid" class="ui-btn-active"></a></li>
+						<li><a href="#" data-icon="star"></a></li>
+						<li><a href="#" data-icon="user"></a></li>
+		            </ul>
+		        </div>
+		    </div>
+		</div>
+		<script>
+			/*$(document).on("pagebeforecreate", function(){
+				alert("pagebeforecreate");
+			});
+			$(document).on("pagecreate", function(){
+				alert("pagecreate");
+			});
+			$(document).on("pageinit", function(){
+				alert("pageinit");
+			});*/
+		</script>
+		<script>
+		 	//跨域中转
+			var urlPre = "http://crossorigin.me/http://";
+		    //通过发车站和到达站查询火车时刻表
+		    var url1 = "ws.webxml.com.cn/WebServices/TrainTimeWebService.asmx/getStationAndTimeByStationName?UserID=";
+		    //通过火车车次查询本火车时刻表
+		    var url2 = "ws.webxml.com.cn/WebServices/TrainTimeWebService.asmx/getStationAndTimeDataSetByLikeTrainCode?UserID=";
+		    //通过火车车次查询列车经由车站明细
+		    var url3 = "ws.webxml.com.cn/WebServices/TrainTimeWebService.asmx/getDetailInfoByTrainCode?UserID=";
+		    
+		    //获取车次列表
+		    var getTrainList=function(){
+		    	if($("#trainNum").val() || ($("#startStation").val() && $("#endStation").val())){
+		    		var searchButton=$(this);
+		    		$("#search-submit").attr("disabled","true");
+		    		var list=$("#list");
+		    		$.mobile.loading("show");
+		    		var _data={};
+		    		var _url=url1;
+
+		    		if(!$("#trainNum").val()){
+		    			_data.StartStation=$("#startStation").val();
+		    			_data.ArriveStation=$("#endStation").val();
+		    		}else{
+		    			_data.TrainCode=$("#trainNum").val();
+		    			_url=url2;
+		    		}
+
+		    		$.get(urlPre + _url, _data, function(data){
+		    			list.html("");
+		    			var timeTables=$(data).find("TimeTable");
+		    			var _arr=[];
+		    			timeTables.each(function(index,item){
+		    				if(index>10) return false;
+		    				var that=$(this);
+		    				if(that.find("FirstStation").text()==="数据没有被发现"){
+		    					alert("数据没有被发现");
+		    					return false;
+		    				}
+
+		    				var _html='<li><a href="#" data-no="' + that.find("TrainCode").text() + '">' +
+                                    '<h2>' + that.find("TrainCode").text() + '次</h2>' +
+                                    '<p>' + that.find("FirstStation").text() + ' → ' + that.find("LastStation").text() + '</p>' +
+                                    '<p>用时：' + that.find("UseDate").text() + '</p>' +
+                                    '<p class="ui-li-aside">' + that.find("StartTime").text() + ' 开</p>' +
+                                    '</a></li>';
+                            _arr.push(_html);
+		    			});
+		    			if(_arr.length>0){
+		    				list.html(_arr.join(""));
+		    				list.listview("refresh");
+		    			}
+
+		    			$.mobile.loading("hide");
+		    			searchButton.attr("disabled",false);
+		    		});
+
+		    	} else {
+		    		alert("请输入发车站和终点站，或者车次");
+		    	}
+		    }
+		    //获取车次详细信息
+		    var isAjax=false;//是否正在获取车次详细信息
+		    var getInfoByTrainCode=function(){
+		    	$.mobile.loading("show");
+		    	if(isAjax) return;
+		    	var trainCode=$(this).attr("data-no");
+		    	$.get(urlPre + url3, {TrainCode: trainCode},function(data){
+		    		$("#detail").find(".ui-content h2").first().html(trainCode + "次");
+		    		var tbody=$("#detail").find(".ui-content tbody");
+			    	tbody.html("");
+
+			    	$(data).find("TrainDetailInfo").each(function(index,item){
+			    		var tr=$("<tr></tr>");
+			    		var that=$(this);
+			    		var _html='<td>' + that.find("TrainStation").text() + '</td>' + '<td>' + that.find("ArriveTime").text() + '</td>' + '<td>' + that.find("StartTime").text() + '</td>';
+			    		tr.html(_html);
+			    		tbody.append(tr);
+			    	});
+			    	$.mobile.loading("hide");
+			    	isAjax=false;
+			    	$.mobile.changePage("#detail");
+		    	});
+		    };
+
+		    var bindEvent=function(){
+		    	$("#search-submit").on("click",getTrainList);
+		    	//为list每个a标签绑定事件
+		    	$("#list").on("click","a",getInfoByTrainCode);
+		    };
+		    //页面载入时初始化
+		    $(document).on("pageinit","#index",function(){
+		    	bindEvent();
+		    });
+		</script>
+	</body>
+</html>
