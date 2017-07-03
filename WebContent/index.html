@@ -179,6 +179,7 @@
 		    var getInfoByTrainCode=function(){
 		    	$.mobile.loading("show");
 		    	if(isAjax) return;
+		    	isAjax=true;
 		    	var trainCode=$(this).attr("data-no");
 		    	$.get(urlPre + url3, {TrainCode: trainCode},function(data){
 		    		$("#detail").find(".ui-content h2").first().html(trainCode + "次");
