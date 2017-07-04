@@ -197,10 +197,13 @@
 			    	$(data).find("TrainDetailInfo").each(function(index,item){
 			    		var tr=$("<tr></tr>");
 			    		var that=$(this);
+			    		var arriveTime=that.find("ArriveTime").text();
 			    		var _html='<td>' + that.find("TrainStation").text() + '</td>' + '<td>' + that.find("ArriveTime").text() + '</td>' + '<td>' + that.find("StartTime").text() + '</td>';
 			    		tr.html(_html);
 			    		tbody.append(tr);
 			    	});
+			    	$("#detail tbody :first-child :nth-child(2)").text("--");
+			    	$("#detail tbody :last-child :last-child").text("--");
 			    	$.mobile.loading("hide");
 			    	isAjax=false;
 			    	$.mobile.changePage("#detail");
