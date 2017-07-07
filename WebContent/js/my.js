@@ -52,6 +52,11 @@ var getTrainList=function(){
 
             $.mobile.loading("hide");
             searchButton.attr("disabled",false);
+        })
+        .fail(function(){
+            $.mobile.loading("hide");
+            searchButton.attr("disabled",false);
+            alert("获取数据失败");
         });
 
     } else {
@@ -93,6 +98,11 @@ var getInfoByTrainCode=function(){
         $.mobile.loading("hide");
         isAjax=false;
         $.mobile.changePage("#detail");
+    })
+    .fail(function(){
+        $.mobile.loading("hide");
+        isAjax=false;
+        alert("获取数据失败");
     });
 };
 
