@@ -91,6 +91,7 @@
 		                <th data-priority="1">站名</th>
 		                <th data-priority="persist">到站时间</th>
 		                <th data-priority="persist">出发时间</th>
+		                <th data-priority="persist">停留</th>
 		            </tr>
 		            </thead>
 		            <tbody>
@@ -197,13 +198,22 @@
 			    	$(data).find("TrainDetailInfo").each(function(index,item){
 			    		var tr=$("<tr></tr>");
 			    		var that=$(this);
+			    		var stopTime="";
+			    		var startTime=that.find("StartTime").text();
 			    		var arriveTime=that.find("ArriveTime").text();
-			    		var _html='<td>' + that.find("TrainStation").text() + '</td>' + '<td>' + that.find("ArriveTime").text() + '</td>' + '<td>' + that.find("StartTime").text() + '</td>';
+			    		if(startTime&&arriveTime){
+			    			stopTime=(new Date('2017-01-01'+' '+startTime)-new Date('2017-01-01'+' '+arriveTime))/1000/60+'分';
+			    		}
+			    		if(!startTime){
+			    			startTime='--';
+			    		}
+			    		if(!arriveTime){
+			    			arriveTime='--';
+			    		}
+			    		var _html='<td>' + that.find("TrainStation").text() + '</td>' + '<td>' + arriveTime + '</td>' + '<td>' + startTime + '</td>' + '<td>' + stopTime + '</td>';
 			    		tr.html(_html);
 			    		tbody.append(tr);
 			    	});
-			    	$("#detail tbody :first-child :nth-child(2)").text("--");
-			    	$("#detail tbody :last-child :last-child").text("--");
 			    	$.mobile.loading("hide");
 			    	isAjax=false;
 			    	$.mobile.changePage("#detail");
